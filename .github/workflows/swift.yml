@@ -1,19 +1,14 @@
-name: Swift
+language: swift
+osx_image: xcode12.5
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+env:
+  matrix:
+   - DESTINATION="platform=iOS Simulator,OS=14.5,name=iPhone 11"
 
-jobs:
-  build:
+before_script: cd CICD
 
-    runs-on: macos-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: swift build -v
-    - name: Run tests
-      run: swift test -v
+script:
+   - xcodebuild clean test -project CICD.xcodeproj -scheme CICD -destination "$DESTINATION" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+   
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
